@@ -52,7 +52,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
         try {
-//            jdbcTemplate.execute("show tables");
+            jdbcTemplate.execute("show tables");
             // txt file(userId.txt) exist for user in "sql_resource" folder ?
             // create one
             // create Json
