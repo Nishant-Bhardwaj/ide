@@ -19,9 +19,6 @@ public class ConnectionController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
-
-        conService.createConnection(dataSourceRequest);
-
-        return new ResponseEntity<>("connection success!", HttpStatus.OK);
+        return new ResponseEntity<>(conService.createConnection(dataSourceRequest), HttpStatus.OK);
     }
 }
