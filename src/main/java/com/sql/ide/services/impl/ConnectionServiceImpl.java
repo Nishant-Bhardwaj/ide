@@ -1,34 +1,28 @@
 package com.sql.ide.services.impl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sql.ide.domain.DataSourceRequest;
 import com.sql.ide.services.ConnectionService;
 import com.sql.ide.services.CryptoService;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.io.BufferedWriter;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.util.json.JSONParser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.boot.jackson.JsonObjectDeserializer;
-import org.springframework.boot.jackson.JsonObjectSerializer;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ConnectionServiceImpl implements ConnectionService {
@@ -50,6 +44,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         dataSource.setPassword(cryptoService.decrypt(dataSourceRequest.getPassword()));
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        String connections=new String();
 
         try {
             jdbcTemplate.execute("show tables");
@@ -64,6 +59,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             Path filepath = (Path)Paths.get("sql_resource", dataSourceRequest.getUsername()+ ".txt").toAbsolutePath();
 
             String path = String.valueOf(filepath);
+           
 
             File file = new File(path);
 
@@ -124,6 +120,8 @@ public class ConnectionServiceImpl implements ConnectionService {
                 fw.write(cryptoService.encrypt(allJson));
                 fw.close();
             }
+            connections=readFileAsString(path);
+            connections=cryptoService.decrypt(connections);
 
         } catch (Exception e) {
             // invalid details, return error
@@ -131,9 +129,24 @@ public class ConnectionServiceImpl implements ConnectionService {
             logger.error(errMsg);
             return errMsg;
         }
-
-        return "Connection Created and Stored Successfully!";
+       
+        
+        
+        return connections;
     }
+    public static String readFileAsString(String filePath) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+
+        bufferedReader.close();
+        return stringBuilder.toString();
+    }
+
 
 
 }
