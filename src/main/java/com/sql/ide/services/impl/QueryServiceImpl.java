@@ -2,6 +2,7 @@ package com.sql.ide.services.impl;
 
 import com.sql.ide.domain.DataSourceRequest;
 import com.sql.ide.domain.QueryRequest;
+import com.sql.ide.domain.QueryResponse;
 import com.sql.ide.services.ConnectionService;
 import com.sql.ide.services.CryptoService;
 import com.sql.ide.services.QueryService;
@@ -59,19 +60,15 @@ public class QueryServiceImpl implements QueryService {
 
         try{
             List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(query);
-            return queryResults;
+            return QueryResponse.builder()
+                    .response(queryResults)
+                    .build();
+
         }catch (Exception e){
             jdbcTemplate.execute(query);
+            return QueryResponse.builder()
+                    .response("Successfully Executed Query.")
+                    .build();
         }
-        if (dataSource instanceof Closeable) {
-            try {
-                ((Closeable) dataSource).close();
-            } catch (IOException e) {
-                // handle the exception
-                logger.error("Exception closing datasource object: "+ e.getMessage());
-            }
-        }
-
-        return null;
     }
 }
