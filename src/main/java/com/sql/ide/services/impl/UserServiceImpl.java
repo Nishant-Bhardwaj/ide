@@ -1,9 +1,14 @@
 package com.sql.ide.services.impl;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sql.ide.domain.DataSourceRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +33,9 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public String fetchUserConnections(String username) {
+	public List<DataSourceRequest> fetchUserConnections(String username) throws Exception {
 		logger.info("Fetching connections for User: "+ username);
-		String connections = null;
+
 		Path filepath = (Path) Paths.get("sql_resource", username + ".txt").toAbsolutePath();
 
 		String path = String.valueOf(filepath);
@@ -41,15 +46,21 @@ public class UserServiceImpl implements UserService {
 
 			
 			try {
-				connections = connectionService.readFileAsString(path);
-				connections = cryptoService.decrypt(connections);
+				ObjectMapper objectMapper = new ObjectMapper();
+				String jsonString = cryptoService.decrypt(new String(Files.readAllBytes(Paths.get(path))));
+
+				List<DataSourceRequest> allConnectionDetails = objectMapper.readValue(jsonString,
+						new TypeReference<List<DataSourceRequest>>() {
+						});
+
+				return allConnectionDetails;
+
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			return connections;
+			return null;
 		} 
-		return "User doesn't exist";
+		throw new Exception("User doesn't exist");
 	}
 }

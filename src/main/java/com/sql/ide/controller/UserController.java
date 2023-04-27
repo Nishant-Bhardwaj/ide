@@ -24,7 +24,7 @@ public class UserController {
 	UserService userService;
 
 	@GetMapping(path = "/connections")
-	public ResponseEntity<String> fetchUserConnections(@RequestHeader("user") String username) throws Exception {
+	public ResponseEntity<Object> fetchUserConnections(@RequestHeader("user") String username) throws Exception {
 		logger.info("Fetching connections of User: START");
 
 		return new ResponseEntity<>(userService.fetchUserConnections(username), HttpStatus.OK);

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.sql</groupId>
 	<artifactId>ide</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>sql</version>
 	<name>ide</name>
 	<description>Project for SQL Developer IDE</description>
 	<properties>
