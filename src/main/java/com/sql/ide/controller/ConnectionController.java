@@ -29,4 +29,14 @@ public class ConnectionController {
     public ResponseEntity<DataSourceRequest> selectConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
         return new ResponseEntity<>(conService.selectConnection(dataSourceRequest), HttpStatus.OK);
     }
+    
+    @PostMapping("/delete")
+    public ResponseEntity<DataSourceResponse> deleteConnection(@Valid @RequestBody DataSourceRequest dataSourceRequest) throws Exception {
+        return new ResponseEntity<>(conService.deleteConnection(dataSourceRequest.getUsername(),dataSourceRequest.getConnectionName()), HttpStatus.OK);
+    }
+    
+    @PostMapping("/update")
+    public ResponseEntity<DataSourceResponse> updateConnection(@Valid @RequestBody DataSourceRequest dataSourceRequest) throws Exception {
+        return new ResponseEntity<>(conService.updateConnection(dataSourceRequest), HttpStatus.OK);
+    }
 }

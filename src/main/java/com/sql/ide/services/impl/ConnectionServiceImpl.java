@@ -1,5 +1,6 @@
 package com.sql.ide.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sql.ide.domain.DataSourceRequest;
@@ -263,6 +264,100 @@ public class ConnectionServiceImpl implements ConnectionService {
 			throw new Exception("User not found");
 		}
 
+	}
+	
+	@Override
+	public DataSourceResponse deleteConnection(String userName, String connectionName) throws Exception {
+		// TODO Auto-generated method stub
+		Path filepath = (Path) Paths.get("sql_resource", userName + ".txt").toAbsolutePath();
+
+		String path = String.valueOf(filepath);
+
+		File file = new File(path);
+
+		if (file.exists()) {
+
+			ObjectMapper objectMapper = new ObjectMapper();
+			String jsonString = cryptoService.decrypt(new String(Files.readAllBytes(Paths.get(path))));
+
+			List<DataSourceRequest> allConnectionDetails = objectMapper.readValue(jsonString,
+					new TypeReference<List<DataSourceRequest>>() {
+					});
+
+			if (allConnectionDetails.size() > 0) {
+				Optional<DataSourceRequest> dataSource = allConnectionDetails.stream()
+						.filter(x -> x.getConnectionName().equals(connectionName))
+						.filter(y -> y.getUsername().equals(userName)).findFirst();
+
+				if (dataSource.isPresent()) {
+					allConnectionDetails.remove(dataSource.get());
+					updateFile(file, allConnectionDetails);
+					String msg = "Connection deleted successfully!";
+					return DataSourceResponse.builder().message(msg).build();
+				}
+
+				else
+					throw new Exception("Invalid connection request. Connection does not exist");
+
+			} else {
+				throw new Exception("Invalid connection request. Connection does not exist");
+			}
+
+		} else {
+			throw new Exception("Not a valid user!!");
+		}
+	}
+	
+	@Override
+	public DataSourceResponse updateConnection(DataSourceRequest dataSourceRequest) throws Exception {
+		// TODO Auto-generated method stub
+		Path filepath = (Path) Paths.get("sql_resource", dataSourceRequest.getUsername() + ".txt").toAbsolutePath();
+
+		String path = String.valueOf(filepath);
+
+		File file = new File(path);
+
+		if (file.exists()) {
+
+			ObjectMapper objectMapper = new ObjectMapper();
+			String jsonString = cryptoService.decrypt(new String(Files.readAllBytes(Paths.get(path))));
+
+			List<DataSourceRequest> allConnectionDetails = objectMapper.readValue(jsonString,
+					new TypeReference<List<DataSourceRequest>>() {
+					});
+
+			if (allConnectionDetails.size() > 0) {
+				Optional<DataSourceRequest> dataSource = allConnectionDetails.stream()
+						.filter(x -> x.getConnectionName().equals(dataSourceRequest.getConnectionName()))
+						.filter(y -> y.getUsername().equals(dataSourceRequest.getUsername())).findFirst();
+
+				if (dataSource.isPresent()) {
+					allConnectionDetails.remove(dataSource.get());
+					allConnectionDetails.add(dataSourceRequest);
+					updateFile(file,allConnectionDetails);
+					String msg = "Connection updated successfully!";
+					return DataSourceResponse.builder().message(msg).build();
+				}
+
+				else
+					throw new Exception("Invalid connection request. Connection does not exist");
+
+			} else {
+				throw new Exception("Invalid connection request. Connection does not exist");
+			}
+
+		} else {
+			throw new Exception("Not a valid user!!");
+		}
+
+	}
+	
+	private void updateFile(File file, List<DataSourceRequest> allConnectionDetails) throws Exception {
+		FileWriter fw=new FileWriter(file.getAbsoluteFile());
+		ObjectMapper mapper = new ObjectMapper();
+		String allJson = mapper.writeValueAsString(allConnectionDetails);
+		fw.write(cryptoService.encrypt(allJson));
+		fw.close();
 	}
 
 }

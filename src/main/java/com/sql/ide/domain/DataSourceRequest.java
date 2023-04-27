@@ -1,14 +1,15 @@
 package com.sql.ide.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+
+import org.springframework.stereotype.Component;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Component
@@ -18,6 +19,7 @@ public class DataSourceRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	@NotBlank
     private String username;
 
     private String password;

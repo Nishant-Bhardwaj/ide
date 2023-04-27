@@ -3,6 +3,8 @@ package com.sql.ide.services;
 import java.io.IOException;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Service;
 
 import com.sql.ide.domain.DataSourceRequest;
@@ -21,8 +23,12 @@ public interface ConnectionService {
 
 	    DataSourceRequest getActiveConnection();
 
-	    DataSourceRequest getConnectionOfUser(String username, String datasourceUrl) throws Exception;
+	    DataSourceRequest getConnectionOfUser(String username, String connectionName) throws Exception;
     
-    String  readFileAsString(String filePath) throws IOException;
+	    String  readFileAsString(String filePath) throws IOException;
+	    
+	    DataSourceResponse deleteConnection(String username, String connectionName) throws Exception;
+
+		DataSourceResponse updateConnection(@Valid DataSourceRequest dataSourceRequest) throws Exception;
 
 }
