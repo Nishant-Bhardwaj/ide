@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Services implementations related to database connection
@@ -85,6 +86,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 					if (userData.getPassword().equalsIgnoreCase(dataSourceRequest.getPassword())
 							&& userData.getDriver().equalsIgnoreCase(dataSourceRequest.getDriver())
 							&& userData.getUrl().equalsIgnoreCase(dataSourceRequest.getUrl())
+							&& userData.getConnectionName().equals(dataSourceRequest.getConnectionName())
 							&& userData.getUsername().equalsIgnoreCase(dataSourceRequest.getUsername())) {
 						count = 1;
 						break;
@@ -166,12 +168,12 @@ public class ConnectionServiceImpl implements ConnectionService {
 	 * Return connection/ datasource if it is present for user
 	 *
 	 * @param username
-	 * @param datasourceUrl
+	 * @param connectionName
 	 * @return datasource
 	 * @author Nishant Bhardwaj
 	 */
 	@Override
-	public List<DataSourceRequest> getConnectionOfUser(String username, String datasourceUrl) throws Exception {
+	public DataSourceRequest getConnectionOfUser(String username, String connectionName) throws Exception {
 
 		Path filepath = (Path) Paths.get("sql_resource", username + ".txt").toAbsolutePath();
 
@@ -189,9 +191,18 @@ public class ConnectionServiceImpl implements ConnectionService {
 					});
 
 			if (allConnectionDetails.size() > 0) {
-				return allConnectionDetails;
+				 Optional<DataSourceRequest> dataSource = allConnectionDetails.stream()
+						.filter(x->x.getConnectionName().equals(connectionName))
+						.filter(y-> y.getUsername().equals(username))
+						.findFirst();
+
+				 if(dataSource.isPresent())
+					 return dataSource.get();
+				 else
+					 throw new Exception("Invalid connection request!!");
+
 			} else {
-				throw new Exception("Invalid Request!!");
+				throw new Exception("Invalid connection request!!");
 			}
 
 		} else {

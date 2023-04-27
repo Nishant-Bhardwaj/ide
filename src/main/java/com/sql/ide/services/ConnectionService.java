@@ -20,5 +20,5 @@ public interface ConnectionService {
 
     DataSourceRequest getActiveConnection();
 
-    List<DataSourceRequest> getConnectionOfUser(String username, String datasourceUrl) throws Exception;
+    DataSourceRequest getConnectionOfUser(String username, String datasourceUrl) throws Exception;
 }

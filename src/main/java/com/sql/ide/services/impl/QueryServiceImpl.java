@@ -12,6 +12,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -32,18 +37,11 @@ public class QueryServiceImpl implements QueryService {
     CryptoService cryptoService;
 
     @Override
-    public DataSourceRequest validateQueryRequest(QueryRequest queryRequest, String username){
+    public DataSourceRequest validateQueryRequest(QueryRequest queryRequest, String username) throws Exception {
         logger.info("Validating Query req: "+ queryRequest.getQuery());
-        logger.info("Validating Database req: "+ queryRequest.getDatasourceUrl());
+        logger.info("Validating Database connection req: "+ queryRequest.getConnectionName());
 
-        DataSourceRequest activeDatasource = connectionService.getActiveConnection();
-
-        if(activeDatasource.getUrl().equals(queryRequest.getDatasourceUrl())
-            && activeDatasource.getUsername().equals(username)){
-            return activeDatasource;
-        }
-
-        return null;
+        return connectionService.getConnectionOfUser(username, queryRequest.getConnectionName());
     }
 
     @Override
@@ -57,11 +55,21 @@ public class QueryServiceImpl implements QueryService {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
+        String query = new String(Base64.getDecoder().decode(queryRequest.getQuery()));
+
         try{
-            List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(queryRequest.getQuery());
+            List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(query);
             return queryResults;
         }catch (Exception e){
-            jdbcTemplate.execute(queryRequest.getQuery());
+            jdbcTemplate.execute(query);
+        }
+        if (dataSource instanceof Closeable) {
+            try {
+                ((Closeable) dataSource).close();
+            } catch (IOException e) {
+                // handle the exception
+                logger.error("Exception closing datasource object: "+ e.getMessage());
+            }
         }
 
         return null;

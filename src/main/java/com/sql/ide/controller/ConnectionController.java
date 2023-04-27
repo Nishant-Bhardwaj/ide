@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(path = "/v1/connection")
 public class ConnectionController {
@@ -19,7 +21,7 @@ public class ConnectionController {
     ConnectionService conService;
 
     @PostMapping("/create")
-    public ResponseEntity<DataSourceResponse> createConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
+    public ResponseEntity<DataSourceResponse> createConnection(@Valid @RequestBody DataSourceRequest dataSourceRequest) throws Exception {
         return new ResponseEntity<>(conService.createConnection(dataSourceRequest), HttpStatus.OK);
     }
     
