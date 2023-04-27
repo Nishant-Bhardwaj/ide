@@ -13,6 +13,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Query relate service implementations
@@ -56,6 +60,13 @@ public class QueryServiceImpl implements QueryService {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-        return jdbcTemplate.queryForMap(queryRequest.getQuery());
+        try{
+            List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(queryRequest.getQuery());
+            return queryResults;
+        }catch (Exception e){
+            jdbcTemplate.execute(queryRequest.getQuery());
+        }
+
+        return null;
     }
 }

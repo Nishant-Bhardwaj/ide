@@ -8,10 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/v1/query")
@@ -23,11 +20,8 @@ public class QueryController {
     QueryService queryService;
 
     @PostMapping(path="/execute")
-    public ResponseEntity<Object> executeQuery(@RequestBody QueryRequest queryRequest) throws Exception {
+    public ResponseEntity<Object> executeQuery(@RequestBody QueryRequest queryRequest, @RequestHeader("user") String username) throws Exception {
         logger.info("Execute Query endpoint: START");
-
-        // TODO: from header take: username, token
-        String username = null;
 
         DataSourceRequest dataSource = queryService.validateQueryRequest(queryRequest, username);
 
