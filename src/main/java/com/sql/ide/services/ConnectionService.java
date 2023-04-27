@@ -15,6 +15,8 @@ import java.util.List;
 public interface ConnectionService {
 
     DataSourceResponse createConnection(DataSourceRequest dataSourceRequest) throws Exception;
+    
+    DataSourceRequest selectConnection(DataSourceRequest dataSourceRequest) throws Exception;
 
     DataSourceRequest getActiveConnection();
 

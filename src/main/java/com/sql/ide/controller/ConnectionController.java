@@ -22,4 +22,9 @@ public class ConnectionController {
     public ResponseEntity<DataSourceResponse> createConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
         return new ResponseEntity<>(conService.createConnection(dataSourceRequest), HttpStatus.OK);
     }
+    
+    @PostMapping("/select")
+    public ResponseEntity<DataSourceRequest> selectConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
+        return new ResponseEntity<>(conService.selectConnection(dataSourceRequest), HttpStatus.OK);
+    }
 }
