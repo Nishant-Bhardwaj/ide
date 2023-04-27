@@ -268,7 +268,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 	
 	@Override
 	public DataSourceResponse deleteConnection(String userName, String connectionName) throws Exception {
-		// TODO Auto-generated method stub
 		Path filepath = (Path) Paths.get("sql_resource", userName + ".txt").toAbsolutePath();
 
 		String path = String.valueOf(filepath);
@@ -310,7 +309,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 	
 	@Override
 	public DataSourceResponse updateConnection(DataSourceRequest dataSourceRequest) throws Exception {
-		// TODO Auto-generated method stub
 		Path filepath = (Path) Paths.get("sql_resource", dataSourceRequest.getUsername() + ".txt").toAbsolutePath();
 
 		String path = String.valueOf(filepath);
@@ -332,11 +330,29 @@ public class ConnectionServiceImpl implements ConnectionService {
 						.filter(y -> y.getUsername().equals(dataSourceRequest.getUsername())).findFirst();
 
 				if (dataSource.isPresent()) {
-					allConnectionDetails.remove(dataSource.get());
-					allConnectionDetails.add(dataSourceRequest);
-					updateFile(file,allConnectionDetails);
-					String msg = "Connection updated successfully!";
-					return DataSourceResponse.builder().message(msg).build();
+
+					// Create DataSource:
+					DriverManagerDataSource dataSourceCon = new DriverManagerDataSource();
+					dataSourceCon.setDriverClassName(dataSourceRequest.getDriver());
+					dataSourceCon.setUrl(dataSourceRequest.getUrl());
+					dataSourceCon.setUsername(dataSourceRequest.getUsername());
+					dataSourceCon.setPassword(cryptoService.decrypt(dataSourceRequest.getPassword()));
+
+					JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceCon);
+					String connections;
+
+					try {
+						jdbcTemplate.execute("show tables");
+
+						allConnectionDetails.remove(dataSource.get());
+						allConnectionDetails.add(dataSourceRequest);
+						updateFile(file, allConnectionDetails);
+						String msg = "Connection updated successfully!";
+						return DataSourceResponse.builder().message(msg).build();
+
+					}catch (Exception e){
+						throw new Exception("Invalid connection: " + e.getMessage());
+					}
 				}
 
 				else
