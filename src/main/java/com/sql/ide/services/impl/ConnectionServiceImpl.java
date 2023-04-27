@@ -141,7 +141,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
 	}
 
-	public static String readFileAsString(String filePath) throws IOException {
+	public String readFileAsString(String filePath) throws IOException {
 		StringBuilder stringBuilder = new StringBuilder();
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
 

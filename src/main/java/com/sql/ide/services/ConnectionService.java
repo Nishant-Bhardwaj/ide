@@ -1,10 +1,12 @@
 package com.sql.ide.services;
 
-import com.sql.ide.domain.DataSourceRequest;
-import com.sql.ide.domain.DataSourceResponse;
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.sql.ide.domain.DataSourceRequest;
+import com.sql.ide.domain.DataSourceResponse;
 
 /**
  * Services related to database connection
@@ -13,12 +15,14 @@ import java.util.List;
  */
 @Service
 public interface ConnectionService {
+	 DataSourceResponse createConnection(DataSourceRequest dataSourceRequest) throws Exception;
+	    
+	    DataSourceRequest selectConnection(DataSourceRequest dataSourceRequest) throws Exception;
 
-    DataSourceResponse createConnection(DataSourceRequest dataSourceRequest) throws Exception;
+	    DataSourceRequest getActiveConnection();
+
+	    DataSourceRequest getConnectionOfUser(String username, String datasourceUrl) throws Exception;
     
-    DataSourceRequest selectConnection(DataSourceRequest dataSourceRequest) throws Exception;
+    String  readFileAsString(String filePath) throws IOException;
 
-    DataSourceRequest getActiveConnection();
-
-    DataSourceRequest getConnectionOfUser(String username, String datasourceUrl) throws Exception;
 }
