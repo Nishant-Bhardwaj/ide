@@ -2,6 +2,11 @@ package com.sql.ide.services;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * Service interface for crypto service
+ *
+ * @author Nishant Bhardwaj
+ */
 @Service
 public interface CryptoService {
 

@@ -10,6 +10,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Service implementation for crypto service
+ *
+ * @author Nishant Bhardwaj
+ */
 @Service
 public class CryptoServiceImpl implements CryptoService {
 

@@ -1,6 +1,7 @@
 package com.sql.ide.controller;
 
 import com.sql.ide.domain.DataSourceRequest;
+import com.sql.ide.domain.DataSourceResponse;
 import com.sql.ide.services.ConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class ConnectionController {
     ConnectionService conService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
+    public ResponseEntity<DataSourceResponse> createConnection(@RequestBody DataSourceRequest dataSourceRequest) throws Exception {
         return new ResponseEntity<>(conService.createConnection(dataSourceRequest), HttpStatus.OK);
     }
 }

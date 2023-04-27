@@ -1,16 +1,14 @@
 package com.sql.ide.services.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import com.sql.ide.domain.DataSourceResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,11 @@ import com.sql.ide.domain.DataSourceRequest;
 import com.sql.ide.services.ConnectionService;
 import com.sql.ide.services.CryptoService;
 
+/**
+ * Services implementations related to database connection
+ *
+ * @author Nishant Bhardwaj
+ */
 @Service
 public class ConnectionServiceImpl implements ConnectionService {
 
@@ -32,8 +35,10 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Autowired
     CryptoService cryptoService;
 
+    private DataSourceRequest activeDataSource;
+
     @Override
-    public String createConnection(DataSourceRequest dataSourceRequest) throws Exception {
+    public DataSourceResponse createConnection(DataSourceRequest dataSourceRequest) throws Exception {
         logger.info("Create Connection Service :: Start");
 
         // Create DataSource:
@@ -47,26 +52,28 @@ public class ConnectionServiceImpl implements ConnectionService {
         String connections=new String();
 
         try {
-            jdbcTemplate.execute("show tables");
             // txt file(userId.txt) exist for user in "sql_resource" folder ?
             // create one
             // create Json
             //json fetch -> decrypt -> check already present
             // -> (if not)append/add new connection -> encrypt -> save in txt
-            // -> TODO: Connection already exist Exception
+            // -> Connection already exist Exception
             //create txt file for user and save jdbcTemplate after encrypt:
 
-            Path filepath = (Path)Paths.get("sql_resource", dataSourceRequest.getUsername()+ ".txt").toAbsolutePath();
+            jdbcTemplate.execute("show tables");
+
+            // select database/ open connection:
+            activeDataSource = dataSourceRequest;
+
+            Path filepath = (Path) Paths.get("sql_resource", dataSourceRequest.getUsername() + ".txt").toAbsolutePath();
 
             String path = String.valueOf(filepath);
-           
 
             File file = new File(path);
 
             if (file.exists()) {
 
                 ObjectMapper objectMapper = new ObjectMapper();
-
                 String jsonString = cryptoService.decrypt(new String(Files.readAllBytes(Paths.get(path))));
 
                 List<DataSourceRequest> allUserDetails = objectMapper.readValue(jsonString,
@@ -75,6 +82,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
                 logger.info(allUserDetails);
                 int count = 0;
+
                 for (DataSourceRequest userData : allUserDetails) {
                     if (userData.getPassword().equalsIgnoreCase(dataSourceRequest.getPassword())
                             && userData.getDriver().equalsIgnoreCase(dataSourceRequest.getDriver())
@@ -96,21 +104,20 @@ public class ConnectionServiceImpl implements ConnectionService {
                     FileWriter fw = new FileWriter(path);
                     fw.write(encryptedJson);
                     fw.close();
-                }else{
+                } else {
                     String msg = "Connection already exists!";
-                    return msg;
+                    return DataSourceResponse.builder().message(msg).build();
                 }
             } else {
-                Path dirpath = (Path)Paths.get("sql_resource");
+                Path dirpath = (Path) Paths.get("sql_resource");
 
                 File dir = new File(dirpath.toString());
 
-                if(!dir.exists()){
+                if(!dir.exists())
                     dir.mkdirs();
-                }
 
                 file.createNewFile();
-                logger.info("File Created" + file.getName());
+                logger.info("File Created: " + file.getName());
                 FileWriter fw = new FileWriter(file.getAbsoluteFile());
                 ObjectMapper mapper = new ObjectMapper();
                 ArrayList<DataSourceRequest> dataSourceRequestList = new ArrayList<DataSourceRequest>();
@@ -127,12 +134,14 @@ public class ConnectionServiceImpl implements ConnectionService {
             // invalid details, return error
             String errMsg = "Invalid credentials!" + e.getMessage();
             logger.error(errMsg);
-            return errMsg;
+            return DataSourceResponse.builder().message(errMsg).build();
         }
-       
-        
-        
-        return connections;
+
+        return DataSourceResponse.builder()
+                .connectionArray(connections)
+                .message("Connection Successful")
+                .build();
+
     }
     public static String readFileAsString(String filePath) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -147,6 +156,55 @@ public class ConnectionServiceImpl implements ConnectionService {
         return stringBuilder.toString();
     }
 
+
+
+    /**
+     * Return the active database connection
+     *
+     * @author Nishant Bhardwaj
+     */
+    @Override
+    public DataSourceRequest getActiveConnection() {
+        return this.activeDataSource;
+    }
+
+    /**
+     * Return connection/ datasource if it is present for user
+     *
+     * @param username
+     * @param datasourceUrl
+     * @return datasource
+     * @author Nishant Bhardwaj
+     */
+    @Override
+    public List<DataSourceRequest> getConnectionOfUser(String username, String datasourceUrl) throws Exception {
+
+        Path filepath = (Path) Paths.get("sql_resource", username + ".txt").toAbsolutePath();
+
+        String path = String.valueOf(filepath);
+
+        File file = new File(path);
+
+        if (file.exists()) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = cryptoService.decrypt(new String(Files.readAllBytes(Paths.get(path))));
+
+            List<DataSourceRequest> allConnectionDetails = objectMapper.readValue(jsonString,
+                    new TypeReference<List<DataSourceRequest>>() {
+            });
+
+
+            if (allConnectionDetails.size()>0){
+                return allConnectionDetails;
+            }else {
+                throw new Exception("Invalid Request!!");
+            }
+
+        } else {
+            throw new Exception("Not a valid user!!");
+        }
+    }
 
 
 }
