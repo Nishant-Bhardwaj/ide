@@ -1,14 +1,11 @@
 package com.sql.ide.services.impl;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sql.ide.domain.DataSourceRequest;
 import com.sql.ide.domain.DataSourceResponse;
+import com.sql.ide.services.ConnectionService;
+import com.sql.ide.services.CryptoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +13,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sql.ide.domain.DataSourceRequest;
-import com.sql.ide.services.ConnectionService;
-import com.sql.ide.services.CryptoService;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Services implementations related to database connection
@@ -49,7 +47,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         dataSource.setPassword(cryptoService.decrypt(dataSourceRequest.getPassword()));
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        String connections=new String();
+        String connections;
 
         try {
             // txt file(userId.txt) exist for user in "sql_resource" folder ?
