@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "f3f79d4b-6733-4869-9eb2-44c43385b519",
+		"name": "SQL DEV IDE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Connection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"root\",\r\n    \"password\":\"MDEyMzQ1Njc4OWZ1bGxlcpTR8qaApmgnIOhCLJk5qVw=\",\r\n    \"url\":\"jdbc:mysql://localhost:3306/auth_db\",\r\n    \"driver\":\"com.mysql.cj.jdbc.Driver\",\r\n    \"connectionName\" : \"MyCon1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/v1/connection/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"connection",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Connection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"root\",\r\n    \"password\":\"MDEyMzQ1Njc4OWZ1bGxlcpTR8qaApmgnIOhCLJk5qVw=\",\r\n    \"url\":\"jdbc:mysql://localhost:3306/auth_db\",\r\n    \"driver\":\"com.mysql.cj.jdbc.Driver1\",\r\n    \"connectionName\" : \"MyCon1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/v1/connection/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"connection",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Connection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"root\",\r\n    \"password\":\"MDEyMzQ1Njc4OWZ1bGxlcpTR8qaApmgnIOhCLJk5qVw=\",\r\n    \"url\":\"jdbc:mysql://localhost:3306/auth_db\",\r\n    \"driver\":\"com.mysql.cj.jdbc.Driver1\",\r\n    \"connectionName\" : \"MyCon1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/v1/connection/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"connection",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query API",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "user",
+						"value": "root",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"connectionName\":\"MyCon1\",\r\n    \"databaseName\" : \"information_schema\",\r\n    \"query\":\"c2hvdyB0YWJsZXM7\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/v1/query/execute",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"query",
+						"execute"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User all connections",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "user",
+						"value": "root",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8084/v1/user/connections",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"user",
+						"connections"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show Database and Table",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "user",
+						"value": "root",
+						"type": "text"
+					},
+					{
+						"key": "fetchFlag",
+						"value": "database",
+						"description": "table/database",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"connectionName\":\"MyCon1\",\r\n    \"databaseName\" : \"auth_db\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/v1/query/show",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"query",
+						"show"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
