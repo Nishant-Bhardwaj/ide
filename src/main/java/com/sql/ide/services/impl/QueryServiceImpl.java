@@ -82,4 +82,51 @@ public class QueryServiceImpl implements QueryService {
                     .build();
         }
     }
+    
+	@Override
+	public Object executeShowQuery(QueryRequest queryRequest, DataSourceRequest dataSourceRequest) throws Exception {
+
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(dataSourceRequest.getDriver());
+
+		String dataSourceUrl = dataSourceRequest.getUrl();
+
+		if (!dataSourceUrl.endsWith(queryRequest.getDatabaseName())) {
+			if (!dataSourceUrl.endsWith("/")) {
+				dataSourceRequest.setUrl(dataSourceUrl + "/" + queryRequest.getDatabaseName());
+			} else {
+				dataSourceRequest.setUrl(dataSourceUrl + queryRequest.getDatabaseName());
+			}
+		}
+
+		dataSource.setUrl(dataSourceRequest.getUrl());
+		dataSource.setUsername(dataSourceRequest.getUsername());
+		dataSource.setPassword(cryptoService.decrypt(dataSourceRequest.getPassword()));
+
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+		try {
+			List<Map<String, Object>> queryResults = jdbcTemplate.queryForList(queryRequest.getQuery());
+			return QueryResponse.builder().response(queryResults).build();
+
+		} catch (Exception e) {
+			jdbcTemplate.execute(queryRequest.getQuery());
+			return QueryResponse.builder().response("Successfully Executed Query.").build();
+		}
+	}
+    
+	@Override
+	public DataSourceRequest validateShowRequest(QueryRequest queryRequest, String username, String fetchFlag)
+			throws Exception {
+
+		if (fetchFlag.equalsIgnoreCase("table"))
+			queryRequest.setQuery("show tables");
+		else if (fetchFlag.equalsIgnoreCase("database"))
+			queryRequest.setQuery("show databases");
+
+		logger.info("Validating Query req: " + queryRequest.getQuery());
+		logger.info("Validating Database connection req: " + queryRequest.getConnectionName());
+
+		return connectionService.getConnectionOfUser(username, queryRequest.getConnectionName());
+	}
 }

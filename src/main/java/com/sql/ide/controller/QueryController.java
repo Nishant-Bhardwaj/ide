@@ -31,4 +31,16 @@ public class QueryController {
 
         return new ResponseEntity<>(queryService.executeQuery(queryRequest, dataSource), HttpStatus.OK);
     }
+    
+    @PostMapping(path="/show")
+    public ResponseEntity<Object> showQuery(@RequestBody QueryRequest queryRequest, @RequestHeader("user") String username,@RequestHeader("fetchFlag") String fetchFlag) throws Exception {
+        logger.info("Show Query endpoint: START");
+        DataSourceRequest dataSource = queryService.validateShowRequest(queryRequest, username,fetchFlag);
+
+        if(null == dataSource){
+            return new ResponseEntity<>("Please select correct Database!", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(queryService.executeShowQuery(queryRequest, dataSource), HttpStatus.OK);
+    }
 }

@@ -14,4 +14,9 @@ public interface QueryService {
     DataSourceRequest validateQueryRequest(QueryRequest queryRequest, String username) throws Exception;
 
     Object executeQuery(QueryRequest queryRequest, DataSourceRequest dataSource) throws Exception;
+    
+    DataSourceRequest validateShowRequest(QueryRequest queryRequest, String username, String fetchFlag) throws Exception;
+
+	Object executeShowQuery(QueryRequest queryRequest, DataSourceRequest dataSourceRequest)
+			throws Exception;
 }
