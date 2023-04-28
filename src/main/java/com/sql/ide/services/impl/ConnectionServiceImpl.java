@@ -60,7 +60,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 			// -> Connection already exist Exception
 			// create txt file for user and save jdbcTemplate after encrypt:
 
-			jdbcTemplate.execute("show tables");
+			jdbcTemplate.execute("show databases");
 
 			// select database/ open connection:
 			activeDataSource = dataSourceRequest;
@@ -194,7 +194,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 			if (allConnectionDetails.size() > 0) {
 				 Optional<DataSourceRequest> dataSource = allConnectionDetails.stream()
 						.filter(x->x.getConnectionName().equals(connectionName))
-						.filter(y-> y.getUsername().equals(username))
 						.findFirst();
 
 				 if(dataSource.isPresent())
@@ -342,7 +341,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 					String connections;
 
 					try {
-						jdbcTemplate.execute("show tables");
+						jdbcTemplate.execute("show databases");
 
 						allConnectionDetails.remove(dataSource.get());
 						allConnectionDetails.add(dataSourceRequest);

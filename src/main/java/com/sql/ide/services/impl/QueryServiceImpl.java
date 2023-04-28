@@ -50,6 +50,17 @@ public class QueryServiceImpl implements QueryService {
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(dataSourceRequest.getDriver());
+
+        String dataSourceUrl = dataSourceRequest.getUrl();
+
+        if(!dataSourceUrl.endsWith(queryRequest.getDatabaseName())){
+            if(!dataSourceUrl.endsWith("/")){
+                dataSourceRequest.setUrl(dataSourceUrl+"/"+queryRequest.getDatabaseName());
+            }else {
+                dataSourceRequest.setUrl(dataSourceUrl+queryRequest.getDatabaseName());
+            }
+        }
+
         dataSource.setUrl(dataSourceRequest.getUrl());
         dataSource.setUsername(dataSourceRequest.getUsername());
         dataSource.setPassword(cryptoService.decrypt(dataSourceRequest.getPassword()));

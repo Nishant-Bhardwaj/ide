@@ -18,4 +18,6 @@ public class QueryRequest implements Serializable {
     private String connectionName;
 
     private String query;
+
+    private String databaseName;
 }
